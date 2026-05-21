@@ -154,6 +154,15 @@ export interface Exception {
   ageMin: number;
 }
 
+export type OverrideReasonCategory =
+  | "missing_docs"
+  | "coverage_ambiguity"
+  | "injury_severity"
+  | "fraud_siu"
+  | "customer_escalation"
+  | "load_balancing"
+  | "conflict";
+
 export interface OverrideEvent {
   id: string;
   ts: string;
@@ -162,8 +171,26 @@ export interface OverrideEvent {
   fromRouting: string;
   toRouting: string;
   reason: string;
+  reasonCategory?: OverrideReasonCategory;
   confidence: number;
   category: "intake" | "coverage" | "siu" | "complex";
+}
+
+export interface Toast {
+  id: string;
+  kind: "good" | "info" | "warn" | "crit";
+  title: string;
+  body?: string;
+  ts: number;
+}
+
+export interface DemoStep {
+  step: number;
+  title: string;
+  body: string;
+  goto?: "/workbench" | "/operations" | "/governance";
+  claimId?: string;
+  highlight?: string;
 }
 
 export interface IntegrationNode {

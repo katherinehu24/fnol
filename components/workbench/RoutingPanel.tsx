@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Panel, Pill, ConfidenceBar, IconDot } from "@/components/ui/primitives";
 import { ADJUSTERS, getAdjusterById } from "@/lib/data";
-import { useWorkbench } from "@/lib/store";
-import type { Claim, RoutingDecision } from "@/lib/types";
+import { REASON_LABELS, useWorkbench } from "@/lib/store";
+import type { Claim, OverrideReasonCategory, RoutingDecision } from "@/lib/types";
 
 const DECISION_LABEL: Record<RoutingDecision, string> = {
   auto_assign: "Auto-assign",
@@ -22,17 +22,53 @@ const DECISION_TONE: Record<RoutingDecision, "good" | "warn" | "crit" | "info"> 
   manual_reconciliation: "warn",
 };
 
+type Tier = "auto" | "review" | "escalate";
+
+function tierFor(confidence: number, hasSiu: boolean): Tier {
+  if (hasSiu) return "escalate";
+  if (confidence >= 0.85) return "auto";
+  if (confidence >= 0.5) return "review";
+  return "escalate";
+}
+
+const TIER_LABEL: Record<Tier, string> = {
+  auto: "Auto-route eligible",
+  review: "Human review",
+  escalate: "Escalation required",
+};
+
+const TIER_TONE: Record<Tier, "good" | "warn" | "crit"> = {
+  auto: "good",
+  review: "warn",
+  escalate: "crit",
+};
+
+const TIER_RULE: Record<Tier, string> = {
+  auto: "≥ 0.85 confidence · no SIU indicators",
+  review: "0.50 – 0.85 · or coverage ambiguity flagged",
+  escalate: "< 0.50 · or any SIU indicator triggered",
+};
+
 export function RoutingPanel({ claim }: { claim: Claim }) {
-  const { confirmAssignment, overrideRouting, escalateClaim, requestDocuments } = useWorkbench();
+  const { confirmAssignment, overrideRouting, escalateClaim, requestDocuments, focusAuditTrail } = useWorkbench();
   const [overrideOpen, setOverrideOpen] = useState(false);
 
   const passing = claim.routing.confidence >= claim.routing.threshold;
   const assignee = getAdjusterById(claim.routing.assigneeId);
-
+  const tier = tierFor(claim.routing.confidence, !!claim.siuFlags?.length);
   const decided = !!claim.decision;
 
   return (
     <div className="overflow-y-auto p-3 space-y-3 bg-ink-850 border-l border-ink-700">
+      {/* Tier badge — the explicit auto/review/escalate framing */}
+      <div className="panel px-3 py-2.5">
+        <div className="flex items-center justify-between mb-2">
+          <span className="data-label">Confidence tier</span>
+          <Pill tone={TIER_TONE[tier]}>{TIER_LABEL[tier]}</Pill>
+        </div>
+        <ThresholdGuide tier={tier} confidence={claim.routing.confidence} hasSiu={!!claim.siuFlags?.length} />
+      </div>
+
       {/* Routing recommendation */}
       <Panel
         title="Routing recommendation"
@@ -134,19 +170,33 @@ export function RoutingPanel({ claim }: { claim: Claim }) {
               {claim.decision?.note}
               {claim.decision?.reroutedTo && <> → {claim.decision.reroutedTo}</>}
             </div>
+            <button
+              onClick={focusAuditTrail}
+              className="mt-2 text-2xs text-ink-300 hover:text-ink-100 uppercase tracking-wider underline-offset-2 hover:underline"
+            >
+              View audit trail
+            </button>
           </div>
         ) : (
-          <ActionButtons claim={claim} passing={passing} onOverride={() => setOverrideOpen(true)} confirm={() => confirmAssignment(claim.id, claim.routing.assigneeName ?? "—")} escalate={escalateClaim} request={requestDocuments} />
+          <ActionButtons
+            claim={claim}
+            passing={passing}
+            onOverride={() => setOverrideOpen(true)}
+            confirm={() => confirmAssignment(claim.id, claim.routing.assigneeName ?? "—")}
+            escalate={escalateClaim}
+            request={requestDocuments}
+            focusAudit={focusAuditTrail}
+          />
         )}
       </Panel>
 
-      {/* Override modal — inline panel */}
+      {/* Override panel */}
       {overrideOpen && (
         <OverridePanel
           claim={claim}
           onClose={() => setOverrideOpen(false)}
-          onSubmit={(assignee, reason) => {
-            overrideRouting(claim.id, assignee, reason);
+          onSubmit={(assignee, category, notes) => {
+            overrideRouting(claim.id, assignee, category, notes);
             setOverrideOpen(false);
           }}
         />
@@ -165,6 +215,50 @@ export function RoutingPanel({ claim }: { claim: Claim }) {
   );
 }
 
+function ThresholdGuide({ tier, confidence, hasSiu }: { tier: Tier; confidence: number; hasSiu: boolean }) {
+  const pct = Math.round(confidence * 100);
+  return (
+    <div className="space-y-1">
+      <TierLine label="Auto-route eligible" range="≥ 85%" tone="good" active={tier === "auto"} />
+      <TierLine label="Human review" range="50 – 85%" tone="warn" active={tier === "review"} />
+      <TierLine label="Escalation required" range="< 50% · or SIU" tone="crit" active={tier === "escalate"} />
+      <div className="pt-1 mt-1 border-t border-ink-700/60 flex items-baseline justify-between text-2xs text-ink-300">
+        <span>This claim</span>
+        <span className="font-mono text-ink-100">
+          {pct}%
+          {hasSiu && <span className="text-crit"> · SIU triggered</span>}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TierLine({
+  label,
+  range,
+  tone,
+  active,
+}: {
+  label: string;
+  range: string;
+  tone: "good" | "warn" | "crit";
+  active: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between text-2xs ${
+        active ? "text-ink-50" : "text-ink-400"
+      }`}
+    >
+      <span className="flex items-center gap-1.5">
+        <IconDot tone={tone} />
+        {label}
+      </span>
+      <span className={`font-mono ${active ? "text-ink-100" : "text-ink-500"}`}>{range}</span>
+    </div>
+  );
+}
+
 function ActionButtons({
   claim,
   passing,
@@ -172,6 +266,7 @@ function ActionButtons({
   confirm,
   escalate,
   request,
+  focusAudit,
 }: {
   claim: Claim;
   passing: boolean;
@@ -179,13 +274,23 @@ function ActionButtons({
   confirm: () => void;
   escalate: (claimId: string, target: string, reason: string) => void;
   request: (claimId: string, channel: "sms" | "email" | "agent_callback") => void;
+  focusAudit: () => void;
 }) {
   const dec = claim.routing.decision;
+  const auditLink = (
+    <button
+      onClick={focusAudit}
+      className="text-2xs text-ink-300 hover:text-ink-100 uppercase tracking-wider underline-offset-2 hover:underline"
+    >
+      View audit trail
+    </button>
+  );
+
   if (dec === "auto_assign") {
     return (
       <div className="space-y-2">
-        <button onClick={confirm} className="btn btn-primary w-full">
-          Confirm assignment → {claim.routing.assigneeName}
+        <button onClick={confirm} className="btn btn-primary w-full" data-demo="confirm">
+          Approve routing → {claim.routing.assigneeName}
         </button>
         <div className="grid grid-cols-2 gap-2">
           <button onClick={onOverride} className="btn btn-ghost">Override</button>
@@ -193,14 +298,15 @@ function ActionButtons({
             onClick={() => escalate(claim.id, "Senior Review", "Supervisor flagged for review")}
             className="btn btn-ghost"
           >
-            Escalate
+            Escalate to SIU
           </button>
         </div>
-        {!passing && (
-          <div className="text-2xs text-amber">
-            Confidence below threshold — confirmation requires supervisor sign-off.
-          </div>
-        )}
+        <div className="flex justify-between items-center pt-1">
+          {auditLink}
+          {!passing && (
+            <span className="text-2xs text-amber">Below threshold — confirm needs sign-off.</span>
+          )}
+        </div>
       </div>
     );
   }
@@ -210,8 +316,9 @@ function ActionButtons({
         <button
           onClick={() => request(claim.id, "sms")}
           className="btn btn-primary w-full"
+          data-demo="request"
         >
-          Dispatch outbound document request (SMS)
+          Request missing documents (SMS)
         </button>
         <div className="grid grid-cols-2 gap-2">
           <button onClick={() => request(claim.id, "agent_callback")} className="btn btn-ghost">
@@ -221,6 +328,7 @@ function ActionButtons({
             Override → assign now
           </button>
         </div>
+        <div className="flex justify-between items-center pt-1">{auditLink}</div>
       </div>
     );
   }
@@ -228,17 +336,18 @@ function ActionButtons({
     return (
       <div className="space-y-2">
         <button onClick={confirm} className="btn btn-primary w-full">
-          Confirm → {claim.routing.assigneeName} (Senior)
+          Approve routing → {claim.routing.assigneeName} (Senior)
         </button>
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={onOverride} className="btn btn-ghost">Reassign</button>
+          <button onClick={onOverride} className="btn btn-ghost">Override</button>
           <button
             onClick={() => escalate(claim.id, "Compliance · SIU desk", "Manual escalation")}
             className="btn btn-warn"
           >
-            Escalate further
+            Escalate to SIU
           </button>
         </div>
+        <div className="flex justify-between items-center pt-1">{auditLink}</div>
       </div>
     );
   }
@@ -246,17 +355,19 @@ function ActionButtons({
     return (
       <div className="space-y-2">
         <button
-          onClick={() => escalate(claim.id, "Compliance · SIU desk · P. Iyer", "Confirm SIU referral")}
+          onClick={() => escalate(claim.id, "Compliance · SIU desk · P. Iyer", "SIU referral confirmed")}
           className="btn btn-crit w-full"
+          data-demo="escalate"
         >
-          Confirm SIU referral · halt reserve
+          Escalate to SIU · halt reserve
         </button>
         <div className="grid grid-cols-2 gap-2">
           <button onClick={onOverride} className="btn btn-ghost">Override (justify)</button>
           <button onClick={confirm} className="btn btn-ghost">Accept · monitor</button>
         </div>
-        <div className="text-2xs text-crit">
-          SIU override requires written justification. All overrides logged for Compliance review.
+        <div className="flex justify-between items-center pt-1">
+          {auditLink}
+          <span className="text-2xs text-crit">Override requires written reason.</span>
         </div>
       </div>
     );
@@ -265,10 +376,10 @@ function ActionButtons({
     return (
       <div className="space-y-2">
         <button onClick={confirm} className="btn btn-primary w-full">
-          Confirm → {claim.routing.assigneeName} (Senior)
+          Approve routing → {claim.routing.assigneeName} (Senior)
         </button>
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={onOverride} className="btn btn-ghost">Reassign</button>
+          <button onClick={onOverride} className="btn btn-ghost">Override</button>
           <button
             onClick={() => escalate(claim.id, "Subrogation queue", "Open subrogation in parallel")}
             className="btn btn-ghost"
@@ -276,11 +387,22 @@ function ActionButtons({
             Open subrogation
           </button>
         </div>
+        <div className="flex justify-between items-center pt-1">{auditLink}</div>
       </div>
     );
   }
   return null;
 }
+
+const REASON_OPTIONS: OverrideReasonCategory[] = [
+  "missing_docs",
+  "coverage_ambiguity",
+  "injury_severity",
+  "fraud_siu",
+  "customer_escalation",
+  "load_balancing",
+  "conflict",
+];
 
 function OverridePanel({
   claim,
@@ -289,14 +411,23 @@ function OverridePanel({
 }: {
   claim: Claim;
   onClose: () => void;
-  onSubmit: (assignee: string, reason: string) => void;
+  onSubmit: (assignee: string, category: OverrideReasonCategory, notes: string) => void;
 }) {
   const [assignee, setAssignee] = useState<string>(ADJUSTERS[2].name);
-  const [reason, setReason] = useState<string>("");
-  const valid = reason.trim().length > 6;
+  const [category, setCategory] = useState<OverrideReasonCategory>("coverage_ambiguity");
+  const [notes, setNotes] = useState<string>("");
+
   return (
-    <Panel title="Override routing" subtitle="audit-logged · justification required" actions={<button onClick={onClose} className="text-2xs text-ink-300 hover:text-ink-100 uppercase tracking-wider">Cancel</button>}>
-      <div className="space-y-2">
+    <Panel
+      title="Override routing · justification required"
+      subtitle="every override logged for Compliance"
+      actions={
+        <button onClick={onClose} className="text-2xs text-ink-300 hover:text-ink-100 uppercase tracking-wider">
+          Cancel
+        </button>
+      }
+    >
+      <div className="space-y-2.5">
         <div>
           <div className="data-label mb-1">Reassign to</div>
           <select
@@ -311,25 +442,53 @@ function OverridePanel({
             ))}
           </select>
         </div>
+
         <div>
-          <div className="data-label mb-1">Justification (required, logged for compliance)</div>
+          <div className="data-label mb-1">Override category (audit-logged)</div>
+          <div className="grid grid-cols-1 gap-1">
+            {REASON_OPTIONS.map((opt) => (
+              <label
+                key={opt}
+                className={`flex items-center gap-2 px-2 py-1.5 border rounded-sm cursor-pointer text-[12.5px] ${
+                  category === opt
+                    ? "bg-accent/10 border-accent text-ink-50"
+                    : "bg-ink-900 border-ink-700 text-ink-200 hover:border-ink-500"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="reason"
+                  checked={category === opt}
+                  onChange={() => setCategory(opt)}
+                  className="accent-accent"
+                />
+                {REASON_LABELS[opt]}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="data-label mb-1">Notes (optional)</div>
           <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            rows={3}
-            placeholder="e.g. Whitford has 3 prior claims with this insured — reassign to avoid conflict."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={2}
+            placeholder="Optional context — e.g. prior claim on same insured"
             className="w-full bg-ink-900 border border-ink-700 rounded-sm px-2 py-1.5 text-[12.5px] text-ink-100 placeholder-ink-400 focus:outline-none focus:border-accent"
           />
         </div>
+
         <div className="flex items-center justify-between text-2xs text-ink-400">
-          <span>From: <span className="text-ink-100">{claim.routing.assigneeName ?? claim.routing.decision}</span></span>
-          <span>Confidence: <span className="font-mono">{Math.round(claim.routing.confidence * 100)}%</span></span>
+          <span>
+            From: <span className="text-ink-100">{claim.routing.assigneeName ?? claim.routing.decision}</span>
+          </span>
+          <span>
+            Confidence: <span className="font-mono">{Math.round(claim.routing.confidence * 100)}%</span>
+          </span>
         </div>
-        <button
-          disabled={!valid}
-          onClick={() => onSubmit(assignee, reason)}
-          className="btn btn-primary w-full"
-        >
+
+        <button onClick={() => onSubmit(assignee, category, notes)} className="btn btn-primary w-full">
           Submit override
         </button>
       </div>

@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import { useWorkbench } from "@/lib/store";
+import { ToastHost } from "./ui/Toasts";
+import { DemoBar } from "./ui/DemoBar";
 
 const TABS: Array<{ href: string; label: string; hint: string }> = [
   { href: "/workbench", label: "Adjuster Workbench", hint: "Auto PD · Intake" },
@@ -12,6 +15,10 @@ const TABS: Array<{ href: string; label: string; hint: string }> = [
 
 export function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const demoActive = useWorkbench((s) => s.demoMode.active);
+  const startDemo = useWorkbench((s) => s.startDemo);
+  const exitDemo = useWorkbench((s) => s.exitDemo);
+
   return (
     <div className="min-h-screen flex flex-col bg-ink-900 text-ink-100">
       <header className="bg-ink-950 border-b border-ink-700">
@@ -48,7 +55,14 @@ export function Shell({ children }: { children: ReactNode }) {
               })}
             </nav>
           </div>
-          <div className="flex items-center gap-4 text-2xs text-ink-300">
+          <div className="flex items-center gap-3 text-2xs text-ink-300">
+            <button
+              onClick={demoActive ? exitDemo : startDemo}
+              className={`btn h-7 px-2.5 ${demoActive ? "btn-primary" : "btn-ghost"}`}
+              title="Toggle guided demo sequence"
+            >
+              {demoActive ? "Exit demo" : "Demo mode"}
+            </button>
             <div className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-ok" />
               <span>Routines healthy · 11 of 11</span>
@@ -67,9 +81,15 @@ export function Shell({ children }: { children: ReactNode }) {
           <span>SIU profile: <span className="text-ink-100">14 active rules</span></span>
           <span>·</span>
           <span>Last routine sync: <span className="font-mono text-ink-100">14:32:04 ET</span></span>
+          <span className="ml-auto flex items-center gap-1.5 text-amber/80">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+            <span className="uppercase tracking-wider">Simulated data · frontend prototype</span>
+          </span>
         </div>
       </header>
       <main className="flex-1 min-h-0">{children}</main>
+      <ToastHost />
+      <DemoBar />
     </div>
   );
 }
