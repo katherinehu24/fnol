@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #0b0f14;
+  color: #cfd5e0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  border-color: #1f2730;
+}
+
+::selection {
+  background: rgba(61, 126, 255, 0.35);
+  color: #e8ecf2;
+}
+
+/* Subtle scrollbars to fit the enterprise aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #222a37;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2c3543;
+}
+
+@layer components {
+  .panel {
+    @apply bg-ink-850 border border-ink-700 rounded;
+  }
+  .panel-head {
+    @apply px-3 py-2 border-b border-ink-700 flex items-center justify-between;
+  }
+  .panel-title {
+    @apply text-2xs uppercase tracking-[0.12em] text-ink-300 font-medium;
+  }
+  .data-label {
+    @apply text-2xs uppercase tracking-[0.1em] text-ink-300;
+  }
+  .data-value {
+    @apply text-[13px] text-ink-50;
+  }
+  .data-row {
+    @apply flex items-center justify-between gap-3 py-1.5 border-b border-ink-700/60 last:border-b-0;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-[12px] font-medium rounded-sm border transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply bg-accent text-white border-accent-600 hover:bg-accent-600;
+  }
+  .btn-ghost {
+    @apply bg-ink-800 text-ink-100 border-ink-600 hover:bg-ink-750 hover:border-ink-500;
+  }
+  .btn-warn {
+    @apply bg-amber-900 text-amber border-amber/40 hover:bg-amber-900/80;
+  }
+  .btn-crit {
+    @apply bg-crit-900 text-crit border-crit/40 hover:bg-crit-900/80;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 px-1.5 py-0.5 text-[10.5px] font-medium tracking-wide uppercase border rounded-sm leading-none;
+  }
+  .kbd {
+    @apply font-mono text-[11px] text-ink-200;
+  }
+  .table-row {
+    @apply border-b border-ink-700/60;
+  }
+}

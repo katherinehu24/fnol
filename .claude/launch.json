@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "workbench",
+      "runtimeExecutable": "/Users/katherinehu/distyl-gtm/accounts/northbay-workbench/.tooling/node-v20.18.0-darwin-x64/bin/npm",
+      "runtimeArgs": ["run", "dev", "--", "-p", "3030"],
+      "port": 3030,
+      "env": {
+        "PATH": "/Users/katherinehu/distyl-gtm/accounts/northbay-workbench/.tooling/node-v20.18.0-darwin-x64/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "cwd": "/Users/katherinehu/distyl-gtm/accounts/northbay-workbench"
+    }
+  ]
+}
