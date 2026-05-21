@@ -8,9 +8,9 @@ import { ToastHost } from "./ui/Toasts";
 import { DemoBar } from "./ui/DemoBar";
 
 const TABS: Array<{ href: string; label: string; hint: string }> = [
-  { href: "/workbench", label: "Adjuster Workbench", hint: "Auto PD · Intake" },
-  { href: "/operations", label: "Operations", hint: "Maria Chen view" },
-  { href: "/governance", label: "Governance", hint: "Compliance · Audit" },
+  { href: "/architecture", label: "Decision Architecture", hint: "Routing logic" },
+  { href: "/workbench", label: "Adjuster Workbench", hint: "Working surface" },
+  { href: "/operations", label: "Operations", hint: "Impact + audit" },
 ];
 
 export function Shell({ children }: { children: ReactNode }) {

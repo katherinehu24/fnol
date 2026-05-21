@@ -202,15 +202,6 @@ export function RoutingPanel({ claim }: { claim: Claim }) {
         />
       )}
 
-      <Panel title="Workflow delta" subtitle="vs. pre-deployment baseline">
-        <ul className="text-[12.5px] text-ink-100 space-y-1.5">
-          <DeltaLine ok>FNOL → assembled claim package: <span className="font-mono">11m</span> <span className="text-ink-400">(was ~3h)</span></DeltaLine>
-          <DeltaLine ok>Manual document chase: <span className="font-mono">eliminated</span> for clean intakes</DeltaLine>
-          <DeltaLine ok>Policy + coverage bind: <span className="font-mono">automatic</span> from PolicyCenter</DeltaLine>
-          <DeltaLine ok>Adjuster sees: assembled package, not swivel-chair tasks</DeltaLine>
-          <DeltaLine warn>Override path preserved · human judgment visible in audit</DeltaLine>
-        </ul>
-      </Panel>
     </div>
   );
 }
@@ -496,11 +487,3 @@ function OverridePanel({
   );
 }
 
-function DeltaLine({ children, ok, warn }: { children: React.ReactNode; ok?: boolean; warn?: boolean }) {
-  return (
-    <li className="flex items-start gap-2">
-      <IconDot tone={warn ? "warn" : ok ? "good" : "neutral"} />
-      <span>{children}</span>
-    </li>
-  );
-}

@@ -9,68 +9,58 @@ const SEVERITY_TONE: Record<string, "good" | "warn" | "crit"> = {
   severe: "crit",
 };
 
-// Each photo is rendered as a stylized SVG placeholder with damage zone labeling.
-// We deliberately avoid loading real images — placeholders communicate "extracted, zone identified."
-function PhotoTile({ label, zone, severity }: { label: string; zone: string; severity: string }) {
-  return (
-    <div className="panel p-0 overflow-hidden">
-      <div className="relative aspect-[4/3] bg-ink-800 border-b border-ink-700">
-        <svg viewBox="0 0 200 150" className="absolute inset-0 w-full h-full">
-          <defs>
-            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1b2230" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="200" height="150" fill="url(#grid)" />
-          {/* Stylized vehicle silhouette */}
-          <g opacity="0.85">
-            <rect x="40" y="55" width="120" height="40" rx="6" fill="#222a37" stroke="#3a4555" />
-            <rect x="55" y="40" width="90" height="22" rx="4" fill="#222a37" stroke="#3a4555" />
-            <circle cx="60" cy="100" r="8" fill="#0e131a" stroke="#3a4555" />
-            <circle cx="140" cy="100" r="8" fill="#0e131a" stroke="#3a4555" />
-          </g>
-          {/* Damage zone highlight */}
-          <g>
-            <rect
-              x={zone.toLowerCase().includes("front") ? 35 : zone.toLowerCase().includes("rear") ? 145 : 80}
-              y={zone.toLowerCase().includes("hood") || zone.toLowerCase().includes("trunk") ? 38 : 60}
-              width="22"
-              height="30"
-              fill={severity === "severe" ? "rgba(217, 74, 74, 0.35)" : severity === "moderate" ? "rgba(217, 154, 43, 0.35)" : "rgba(47, 154, 114, 0.35)"}
-              stroke={severity === "severe" ? "#d94a4a" : severity === "moderate" ? "#d99a2b" : "#2f9a72"}
-              strokeWidth="1.5"
-              strokeDasharray="2 2"
-            />
-          </g>
-        </svg>
-        <div className="absolute top-1 right-1">
-          <Pill tone={SEVERITY_TONE[severity] ?? "neutral"}>{severity}</Pill>
-        </div>
-      </div>
-      <div className="px-2 py-1.5">
-        <div className="text-[11.5px] text-ink-100 truncate">{label}</div>
-        <div className="text-2xs text-ink-400 truncate">Zone: {zone}</div>
-      </div>
-    </div>
-  );
-}
-
 export function PhotosBlock({ claim }: { claim: Claim }) {
   if (claim.photos.length === 0) return null;
+
+  // Summarize zones + severity counts — compact replacement for the 6-tile grid.
+  const zoneSet = Array.from(new Set(claim.photos.map((p) => p.damageZone)));
+  const sevCount: Record<string, number> = { minor: 0, moderate: 0, severe: 0 };
+  claim.photos.forEach((p) => {
+    sevCount[p.severity] = (sevCount[p.severity] ?? 0) + 1;
+  });
+  const worst = sevCount.severe > 0 ? "severe" : sevCount.moderate > 0 ? "moderate" : "minor";
+
   return (
     <Panel
       title="Damage photos · extracted"
-      subtitle={`${claim.photos.length} images · zones identified by Routine`}
-      actions={
-        <Pill tone="info">
-          Auto-tagged
-        </Pill>
-      }
+      subtitle={`${claim.photos.length} images · zones identified · severity assessed`}
+      actions={<Pill tone={SEVERITY_TONE[worst]}>{`worst: ${worst}`}</Pill>}
     >
-      <div className="grid grid-cols-3 lg:grid-cols-6 gap-2">
-        {claim.photos.map((p) => (
-          <PhotoTile key={p.id} label={p.label} zone={p.damageZone} severity={p.severity} />
-        ))}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <div className="data-label mb-1.5">Zones identified</div>
+          <div className="flex flex-wrap gap-1.5">
+            {zoneSet.map((z) => (
+              <span
+                key={z}
+                className="text-[11.5px] text-ink-100 px-2 py-0.5 bg-ink-800 border border-ink-700 rounded-sm"
+              >
+                {z}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="data-label mb-1.5">Severity breakdown</div>
+          <div className="space-y-1.5">
+            {(["severe", "moderate", "minor"] as const).map((s) => {
+              const count = sevCount[s] ?? 0;
+              if (count === 0) return null;
+              const pct = (count / claim.photos.length) * 100;
+              const color =
+                s === "severe" ? "bg-crit" : s === "moderate" ? "bg-amber" : "bg-ok";
+              return (
+                <div key={s} className="flex items-center gap-2 text-[12px]">
+                  <span className="capitalize text-ink-200 w-16">{s}</span>
+                  <div className="flex-1 h-1.5 bg-ink-700 rounded-sm overflow-hidden">
+                    <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="font-mono text-ink-200 w-6 text-right">{count}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </Panel>
   );

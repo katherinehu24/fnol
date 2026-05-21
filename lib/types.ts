@@ -188,7 +188,7 @@ export interface DemoStep {
   step: number;
   title: string;
   body: string;
-  goto?: "/workbench" | "/operations" | "/governance";
+  goto?: "/architecture" | "/workbench" | "/operations" | "/governance";
   claimId?: string;
   highlight?: string;
 }
