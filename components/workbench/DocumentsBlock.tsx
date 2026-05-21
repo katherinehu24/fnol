@@ -24,8 +24,8 @@ const STATUS_TONE: Record<DocumentItem["status"], "good" | "warn" | "crit" | "in
 
 const STATUS_LABEL: Record<DocumentItem["status"], string> = {
   received: "Received",
-  extracted: "Extracted",
-  low_confidence: "Low conf.",
+  extracted: "Reviewed",
+  low_confidence: "Needs review",
   missing: "Missing",
 };
 

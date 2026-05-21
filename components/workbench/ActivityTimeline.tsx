@@ -64,7 +64,7 @@ export function ActivityTimeline({ claim }: { claim: Claim }) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[12.5px] text-ink-50">{entry.action}</span>
                     <Pill tone={tone}>
-                      {entry.actorKind === "routine" ? "Routine" : entry.actorKind === "human" ? "Human" : "System"}
+                      {entry.actorKind === "routine" ? "Automated" : entry.actorKind === "human" ? "Human" : "System"}
                     </Pill>
                     {dt && entry.decision && <Pill tone={dt}>{DECISION_LABEL[entry.decision]}</Pill>}
                   </div>

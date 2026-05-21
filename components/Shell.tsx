@@ -8,9 +8,9 @@ import { ToastHost } from "./ui/Toasts";
 import { DemoBar } from "./ui/DemoBar";
 
 const TABS: Array<{ href: string; label: string; hint: string }> = [
-  { href: "/architecture", label: "Decision Architecture", hint: "Routing logic" },
+  { href: "/architecture", label: "Workflow Alignment", hint: "Routing · governance · measures" },
   { href: "/workbench", label: "Adjuster Workbench", hint: "Working surface" },
-  { href: "/operations", label: "Operations", hint: "Impact + audit" },
+  { href: "/operations", label: "Operations", hint: "Impact · exceptions" },
 ];
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -65,7 +65,7 @@ export function Shell({ children }: { children: ReactNode }) {
             </button>
             <div className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-ok" />
-              <span>Routines healthy · 11 of 11</span>
+              <span>Workflow healthy · all systems</span>
             </div>
             <span className="text-ink-500">|</span>
             <span className="font-mono">env: prod-us-east-1</span>
@@ -74,16 +74,16 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <div className="px-4 h-7 flex items-center gap-4 text-2xs text-ink-400 bg-ink-900 border-t border-ink-700">
-          <span>Deployment: <span className="text-ink-100">FNOL Intake v3.2</span></span>
+          <span>Deployment: <span className="text-ink-100">FNOL Intake · live</span></span>
           <span>·</span>
-          <span>Threshold profile: <span className="text-ink-100">Fast Track ≥ 0.85</span></span>
+          <span>Routing profile: <span className="text-ink-100">Auto-route on clear intake</span></span>
           <span>·</span>
-          <span>SIU profile: <span className="text-ink-100">14 active rules</span></span>
+          <span>SIU criteria: <span className="text-ink-100">14 review rules</span></span>
           <span>·</span>
-          <span>Last routine sync: <span className="font-mono text-ink-100">14:32:04 ET</span></span>
+          <span>Last sync: <span className="font-mono text-ink-100">14:32:04 ET</span></span>
           <span className="ml-auto flex items-center gap-1.5 text-amber/80">
             <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-            <span className="uppercase tracking-wider">Simulated data · frontend prototype</span>
+            <span className="uppercase tracking-wider">Simulated data · prototype</span>
           </span>
         </div>
       </header>

@@ -102,7 +102,7 @@ const CLAIM_READY: Claim = {
     threshold: 0.85,
     rationale: [
       "Single-vehicle rear-end, clear liability per police report (citation issued to other party).",
-      "All intake documents extracted: police report, photos, loss statement, declarations.",
+      "All intake documents received and reviewed: police report, photos, loss statement, declarations.",
       "Damage estimate $6,840 — within Fast Track band ($1.5k–$15k).",
       "No injury, vehicle drivable, no third-party complications.",
       "Coverage clean: COLL applies, deductible $500. PD reserve recommended on other party.",
@@ -114,11 +114,11 @@ const CLAIM_READY: Claim = {
   },
   activity: [
     { id: "A1", ts: ts(11), actor: "FNOL Intake", actorKind: "system", action: "FNOL received", detail: "Online portal · session 8f31c" },
-    { id: "A2", ts: ts(11), actor: "Routine: FNOL Intake v3.2", actorKind: "routine", action: "Policy bound", detail: "Policy NBM-AP-77419-22 — in force", decision: "automated" },
-    { id: "A3", ts: ts(10), actor: "Routine: Doc Extraction v2.4", actorKind: "routine", action: "Photos extracted", detail: "6 images, damage zones identified", decision: "automated" },
-    { id: "A4", ts: ts(10), actor: "Routine: Police Report Parse v1.8", actorKind: "routine", action: "Police report received", detail: "CPD #26-19044 · liability extracted at 0.97 confidence", decision: "automated" },
-    { id: "A5", ts: ts(9), actor: "Routine: Coverage Map v2.1", actorKind: "routine", action: "Coverage applied", detail: "COLL, PD, RENTAL — no ambiguity", decision: "automated" },
-    { id: "A6", ts: ts(9), actor: "Routine: Routing v3.0", actorKind: "routine", action: "Routing recommendation", detail: "Auto-assign → Renee Whitford (Fast Track A) at 0.94 confidence", decision: "automated" },
+    { id: "A2", ts: ts(11), actor: "Intake processing", actorKind: "routine", action: "Policy bound", detail: "Policy NBM-AP-77419-22 — in force", decision: "automated" },
+    { id: "A3", ts: ts(10), actor: "Document review", actorKind: "routine", action: "Photos received", detail: "6 images · damage zones identified", decision: "automated" },
+    { id: "A4", ts: ts(10), actor: "Police report review", actorKind: "routine", action: "Police report received", detail: "CPD #26-19044 · liability captured · review clear", decision: "automated" },
+    { id: "A5", ts: ts(9), actor: "Coverage review", actorKind: "routine", action: "Coverage applied", detail: "COLL, PD, RENTAL — no ambiguity", decision: "automated" },
+    { id: "A6", ts: ts(9), actor: "Operational routing", actorKind: "routine", action: "Routing recommendation", detail: "Auto-assign → Renee Whitford (Fast Track A) · intake clear", decision: "automated" },
   ],
 };
 
@@ -194,10 +194,10 @@ const CLAIM_MISSING_DOC: Claim = {
   },
   activity: [
     { id: "A1", ts: ts(43), actor: "FNOL Intake", actorKind: "system", action: "FNOL received", detail: "Phone IVR · call 7e22a · transferred mid-call" },
-    { id: "A2", ts: ts(43), actor: "Routine: FNOL Intake v3.2", actorKind: "routine", action: "Policy lookup", detail: "Policy NBM-AP-66201-19 — declarations show expired", decision: "automated" },
-    { id: "A3", ts: ts(41), actor: "Routine: Doc Extraction v2.4", actorKind: "routine", action: "Photos extracted (partial)", detail: "2 images, 1 flagged low confidence", decision: "automated" },
-    { id: "A4", ts: ts(40), actor: "Routine: Routing v3.0", actorKind: "routine", action: "Routing held — intake recovery", detail: "Confidence 0.42 below 0.85 threshold. Outbound recovery task created.", decision: "escalated" },
-    { id: "A5", ts: ts(38), actor: "Routine: Intake Recovery v1.1", actorKind: "routine", action: "Outbound SMS dispatched", detail: "Document upload link sent to (312) 555-0192", decision: "automated" },
+    { id: "A2", ts: ts(43), actor: "Intake processing", actorKind: "routine", action: "Policy lookup", detail: "Policy NBM-AP-66201-19 — declarations show expired", decision: "automated" },
+    { id: "A3", ts: ts(41), actor: "Document review", actorKind: "routine", action: "Photos received (partial)", detail: "2 images · 1 flagged for review", decision: "automated" },
+    { id: "A4", ts: ts(40), actor: "Operational routing", actorKind: "routine", action: "Routing held — intake recovery", detail: "Intake assessed as partial · below auto-route readiness. Outbound recovery task created.", decision: "escalated" },
+    { id: "A5", ts: ts(38), actor: "Intake recovery", actorKind: "routine", action: "Outbound SMS dispatched", detail: "Document upload link sent to (312) 555-0192", decision: "automated" },
   ],
 };
 
@@ -286,10 +286,10 @@ const CLAIM_COVERAGE: Claim = {
   },
   activity: [
     { id: "A1", ts: ts(124), actor: "FNOL Intake", actorKind: "system", action: "FNOL received", detail: "Agent submission · agent 4082" },
-    { id: "A2", ts: ts(124), actor: "Routine: FNOL Intake v3.2", actorKind: "routine", action: "Policy bound", detail: "Policy NBM-AP-58820-23 — in force", decision: "automated" },
-    { id: "A3", ts: ts(118), actor: "Routine: Doc Extraction v2.4", actorKind: "routine", action: "Documents extracted", detail: "Police report, photos, tow invoice", decision: "automated" },
-    { id: "A4", ts: ts(108), actor: "Routine: Coverage Map v2.1", actorKind: "routine", action: "Ambiguity flagged", detail: "Permissive-use + UMPD election", decision: "escalated" },
-    { id: "A5", ts: ts(105), actor: "Routine: Routing v3.0", actorKind: "routine", action: "Routing → senior review", detail: "Confidence 0.71. Senior Review queue. Recommended: Sarah Kowalski.", decision: "escalated" },
+    { id: "A2", ts: ts(124), actor: "Intake processing", actorKind: "routine", action: "Policy bound", detail: "Policy NBM-AP-58820-23 — in force", decision: "automated" },
+    { id: "A3", ts: ts(118), actor: "Document review", actorKind: "routine", action: "Documents received", detail: "Police report · photos · tow invoice", decision: "automated" },
+    { id: "A4", ts: ts(108), actor: "Coverage review", actorKind: "routine", action: "Ambiguity flagged", detail: "Permissive-use + UMPD election", decision: "escalated" },
+    { id: "A5", ts: ts(105), actor: "Operational routing", actorKind: "routine", action: "Routing → senior review", detail: "Confidence 0.71. Senior Review queue. Recommended: Sarah Kowalski.", decision: "escalated" },
   ],
 };
 
@@ -356,24 +356,24 @@ const CLAIM_SIU: Claim = {
     confidence: 0.34,
     threshold: 0.85,
     rationale: [
-      "Three SIU indicators triggered. Recommendation: SIU desk review before any reserve posting.",
-      "Photometric analysis on hood/bumper damage inconsistent with claimant low-speed narrative.",
-      "Policy age (28 days) and total-loss profile match historical SIU referral pattern.",
+      "Multiple SIU signals present. SIU desk review required before any reserve posting.",
+      "Damage to hood and bumper inconsistent with claimant's low-speed narrative.",
+      "Policy age (28 days) and total-loss profile match prior SIU referrals.",
       "No third-party witnesses. Driver-only police report filed 14 hours after stated loss.",
     ],
   },
   siuFlags: [
-    "Policy bound <30 days before loss (FL)",
-    "Single-vehicle late-night loss, no witnesses",
-    "Photometric vs. narrative inconsistency (severity)",
-    "Delayed police report (driver-only, 14h)",
+    "Policy bound within 30 days before loss (FL)",
+    "Single-vehicle late-night loss · no witnesses",
+    "Damage inconsistent with claimant narrative",
+    "Police report delayed · driver-only · 14h",
   ],
   activity: [
     { id: "A1", ts: ts(216), actor: "FNOL Intake", actorKind: "system", action: "FNOL received", detail: "Online portal" },
-    { id: "A2", ts: ts(214), actor: "Routine: FNOL Intake v3.2", actorKind: "routine", action: "Policy bound", detail: "Policy NBM-AP-44012-25 — bound 28d prior", decision: "automated" },
-    { id: "A3", ts: ts(210), actor: "Routine: Doc Extraction v2.4", actorKind: "routine", action: "Photos extracted", detail: "12 images, severity assessment complete", decision: "automated" },
-    { id: "A4", ts: ts(206), actor: "Routine: SIU Screen v1.2", actorKind: "routine", action: "SIU indicators triggered", detail: "4 indicators above threshold. Halt auto-routing.", decision: "escalated" },
-    { id: "A5", ts: ts(204), actor: "Routine: Routing v3.0", actorKind: "routine", action: "Routing → SIU desk", detail: "Confidence 0.34. Priya Iyer notified.", decision: "escalated" },
+    { id: "A2", ts: ts(214), actor: "Intake processing", actorKind: "routine", action: "Policy bound", detail: "Policy NBM-AP-44012-25 — bound 28d prior", decision: "automated" },
+    { id: "A3", ts: ts(210), actor: "Document review", actorKind: "routine", action: "Photos received", detail: "12 images · severity assessment complete", decision: "automated" },
+    { id: "A4", ts: ts(206), actor: "SIU review", actorKind: "routine", action: "SIU criteria met", detail: "Four escalation signals · auto-routing halted", decision: "escalated" },
+    { id: "A5", ts: ts(204), actor: "Operational routing", actorKind: "routine", action: "Routing → SIU desk", detail: "Confidence 0.34. Priya Iyer notified.", decision: "escalated" },
   ],
 };
 
@@ -454,16 +454,16 @@ const CLAIM_COMPLEX: Claim = {
     rationale: [
       "Multi-party loss requires liability allocation that exceeds Routine scope.",
       "Subrogation paths identified on two other-party carriers — manual setup required.",
-      "Injury indicator present (BI handled in separate claim, coordinate handoff).",
+      "Injury signal present · BI handled in a separate claim · coordinate handoff.",
       "All intake assembly complete; routing reflects complexity not data quality.",
     ],
   },
   activity: [
     { id: "A1", ts: ts(312), actor: "FNOL Intake", actorKind: "system", action: "FNOL received", detail: "Agent submission · agent 1108" },
-    { id: "A2", ts: ts(310), actor: "Routine: FNOL Intake v3.2", actorKind: "routine", action: "Policy bound", detail: "Policy in force", decision: "automated" },
-    { id: "A3", ts: ts(295), actor: "Routine: Doc Extraction v2.4", actorKind: "routine", action: "CHP report parsed", detail: "12 pages · 4 units · 1 uninsured party identified", decision: "automated" },
-    { id: "A4", ts: ts(280), actor: "Routine: Coverage Map v2.1", actorKind: "routine", action: "Multi-coverage applied", detail: "COLL + PD + UMPD", decision: "automated" },
-    { id: "A5", ts: ts(275), actor: "Routine: Routing v3.0", actorKind: "routine", action: "Routing → manual reconciliation", detail: "Senior assignment recommended: Jamal Forrester", decision: "escalated" },
+    { id: "A2", ts: ts(310), actor: "Intake processing", actorKind: "routine", action: "Policy bound", detail: "Policy in force", decision: "automated" },
+    { id: "A3", ts: ts(295), actor: "Document review", actorKind: "routine", action: "CHP report parsed", detail: "12 pages · 4 units · 1 uninsured party identified", decision: "automated" },
+    { id: "A4", ts: ts(280), actor: "Coverage review", actorKind: "routine", action: "Multi-coverage applied", detail: "COLL + PD + UMPD", decision: "automated" },
+    { id: "A5", ts: ts(275), actor: "Operational routing", actorKind: "routine", action: "Routing → manual reconciliation", detail: "Senior assignment recommended: Jamal Forrester", decision: "escalated" },
   ],
 };
 
@@ -533,7 +533,7 @@ export const OPS_METRICS: MetricSnapshot[] = [
     delta: "+4.1 pts vs. wk2",
     trend: "up",
     intent: "good",
-    sub: "Threshold: ≥ 0.85 confidence",
+    sub: "Auto-route on clear intake",
   },
   {
     label: "Override rate",
@@ -566,7 +566,7 @@ export const EXCEPTIONS: Exception[] = [
   { id: "EXC-2", claimId: "CLM-2026-0451820", category: "missing_doc", detail: "Loss statement not captured — IVR drop", openedAt: ts(44), owner: "Intake Recovery", ageMin: 44 },
   { id: "EXC-3", claimId: "CLM-2026-0451802", category: "coverage_ambiguity", detail: "Permissive-use under TX endorsement", openedAt: ts(108), owner: "S. Kowalski", ageMin: 108 },
   { id: "EXC-4", claimId: "CLM-2026-0451822", category: "coverage_ambiguity", detail: "Multi-vehicle allocation pending CHP supplemental", openedAt: ts(94), owner: "J. Forrester", ageMin: 94 },
-  { id: "EXC-5", claimId: "CLM-2026-0451780", category: "siu_indicator", detail: "4 SIU indicators — photometric vs. narrative", openedAt: ts(206), owner: "P. Iyer", ageMin: 206 },
+  { id: "EXC-5", claimId: "CLM-2026-0451780", category: "siu_indicator", detail: "Multiple SIU signals — evidence inconsistent with narrative", openedAt: ts(206), owner: "P. Iyer", ageMin: 206 },
   { id: "EXC-6", claimId: "CLM-2026-0451818", category: "siu_indicator", detail: "Policy age 31d · single-vehicle total loss", openedAt: ts(106), owner: "P. Iyer", ageMin: 106 },
   { id: "EXC-7", claimId: "CLM-2026-0451756", category: "complex_loss", detail: "4-unit chain-reaction · subrogation across 2 carriers", openedAt: ts(275), owner: "J. Forrester", ageMin: 275 },
   { id: "EXC-8", claimId: "CLM-2026-0451816", category: "complex_loss", detail: "Multi-vehicle, injury claim handoff to BI desk", openedAt: ts(196), owner: "S. Kowalski", ageMin: 196 },
@@ -649,11 +649,11 @@ export const INTEGRATIONS: IntegrationNode[] = [
   { id: "channel-portal", label: "Claimant web portal", kind: "channel", status: "healthy", lastSync: ts(0) },
   { id: "channel-ivr", label: "Phone IVR (Genesys)", kind: "channel", status: "healthy", lastSync: ts(0) },
   { id: "channel-agent", label: "Agent submission portal", kind: "channel", status: "healthy", lastSync: ts(0) },
-  { id: "doc-extract", label: "Routine: Doc Extraction v2.4", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Police reports, photos, declarations" },
-  { id: "fnol-intake", label: "Routine: FNOL Intake v3.2", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Policy bind, coverage map" },
-  { id: "routing", label: "Routine: Routing v3.0", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Confidence ≥ 0.85 auto-assigns" },
-  { id: "siu-screen", label: "Routine: SIU Screen v1.2", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Indicator engine · 14 active rules" },
-  { id: "intake-recovery", label: "Routine: Intake Recovery v1.1", kind: "routine", status: "degraded", lastSync: ts(8), notes: "SMS provider latency elevated (p95 4.1s)" },
+  { id: "doc-extract", label: "Document review", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Police reports, photos, declarations" },
+  { id: "fnol-intake", label: "Intake processing", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Policy bind, coverage map" },
+  { id: "routing", label: "Operational routing", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Confidence ≥ 0.85 auto-assigns" },
+  { id: "siu-screen", label: "SIU review", kind: "routine", status: "healthy", lastSync: ts(0), notes: "Indicator engine · 14 active rules" },
+  { id: "intake-recovery", label: "Intake recovery", kind: "routine", status: "degraded", lastSync: ts(8), notes: "SMS provider latency elevated (p95 4.1s)" },
   { id: "downstream-bi", label: "BI Desk handoff", kind: "downstream", status: "healthy", lastSync: ts(0) },
   { id: "downstream-subro", label: "Subrogation queue", kind: "downstream", status: "healthy", lastSync: ts(0) },
 ];

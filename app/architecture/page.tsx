@@ -14,15 +14,13 @@ export default function ArchitecturePage() {
         {/* Hero */}
         <header>
           <div className="text-2xs uppercase tracking-[0.18em] text-accent">
-            FNOL Auto PD · Routing Architecture
+            FNOL Auto PD · Workflow Alignment
           </div>
           <h1 className="text-[26px] font-medium text-ink-50 mt-2 leading-tight max-w-[920px]">
-            Before deployment, we align on this. After deployment, we measure it. Then we expand.
+            Before deployment, we align on this. After deployment, we measure it.
           </h1>
-          <p className="text-[13.5px] text-ink-200 mt-3 max-w-[880px] leading-relaxed">
-            One workflow, decomposed. Five stages from intake to outcome. Every stage names what gets
-            automated, what needs human review, and what halts for escalation. Thresholds and
-            checkpoints are owned by Compliance — not by the vendor.
+          <p className="text-[13.5px] text-ink-200 mt-4 max-w-[820px] leading-relaxed">
+            One workflow, mapped end to end. At each stage we name what runs automatically, what needs human review, and what halts for escalation. Routing thresholds and review workflows are owned by Compliance.
           </p>
         </header>
 
@@ -32,8 +30,8 @@ export default function ArchitecturePage() {
         {/* HITL checkpoints */}
         <Section
           number="A"
-          title="Human-in-the-loop checkpoints"
-          kicker="Six places where automation stops and a human decides."
+          title="Human review points"
+          kicker="Six places where automation pauses for a person to decide."
         >
           <table className="w-full text-[12.5px]">
             <thead>
@@ -67,20 +65,20 @@ export default function ArchitecturePage() {
           </table>
         </Section>
 
-        {/* Threshold rules */}
+        {/* Escalation criteria */}
         <Section
           number="B"
-          title="Decision thresholds"
-          kicker="Compliance owns these. IT cannot change them. The vendor cannot change them."
+          title="Escalation criteria"
+          kicker="Compliance owns these. Changes require governance review."
         >
           <table className="w-full text-[12.5px]">
             <thead>
               <tr className="text-2xs uppercase tracking-[0.14em] text-ink-300">
                 <th className="text-left font-medium pb-2 pr-4">Routing class</th>
-                <th className="text-left font-medium pb-2 pr-4">Threshold</th>
+                <th className="text-left font-medium pb-2 pr-4">Criteria</th>
                 <th className="text-left font-medium pb-2 pr-4">Below → escalates to</th>
                 <th className="text-left font-medium pb-2 pr-4">Owner</th>
-                <th className="text-left font-medium pb-2">Last calibrated</th>
+                <th className="text-left font-medium pb-2">Last reviewed</th>
               </tr>
             </thead>
             <tbody>
@@ -97,11 +95,11 @@ export default function ArchitecturePage() {
           </table>
         </Section>
 
-        {/* Exception taxonomy */}
+        {/* Exception handling */}
         <Section
           number="C"
-          title="Exception taxonomy"
-          kicker="Nine reasons a claim leaves the auto-route path. Every one has a destination and an owner."
+          title="Exception handling"
+          kicker="Nine reasons a claim leaves the auto-route path. Each has a destination and an owner."
         >
           <table className="w-full text-[12.5px]">
             <thead>
@@ -136,37 +134,37 @@ export default function ArchitecturePage() {
           </table>
         </Section>
 
-        {/* Governance posture */}
+        {/* Governance commitments */}
         <Section
           number="D"
-          title="Governance posture"
-          kicker="Plain language. The four sentences that make this defensible."
+          title="Governance commitments"
+          kicker="Four operating commitments that keep this defensible."
         >
-          <div className="grid grid-cols-2 gap-x-10 gap-y-4">
+          <div className="grid grid-cols-2 gap-x-10 gap-y-5">
             <PostureLine
-              title="Compliance owns the thresholds."
-              body="Threshold changes require Priya's sign-off. Versioned. Vendor cannot push a model change that re-tunes routing without re-approval."
+              title="Compliance owns the routing criteria."
+              body="Changes require Compliance sign-off and are versioned. Vendor and IT cannot change routing without governance review."
             />
             <PostureLine
-              title="Every override is justified, logged, and reviewed."
-              body="Adjusters cannot silently reroute. Reason category is required. The full override register is exported weekly to Compliance."
+              title="Every override is logged with a written reason."
+              body="Adjusters cannot silently change routing. A reason category is required. The override register is reviewed weekly by Compliance."
             />
             <PostureLine
               title="ClaimCenter remains the system of record."
-              body="No shadow data store. Routines write assignments, status, and notes back to Guidewire. Audit history is queryable from either system."
+              body="No parallel system. Assignments, status, and notes write back to Guidewire. Audit history is queryable from either side."
             />
             <PostureLine
-              title="SIU pathway is rule-engine first."
-              body="The SIU rule engine runs before routing. Any indicator above threshold halts auto-routing and pages SIU. Reserve posting blocked until SIU clears."
+              title="SIU review runs first."
+              body="SIU criteria are checked before routing. Any qualifying signal halts auto-routing. Reserve posting is held until SIU clears."
             />
           </div>
         </Section>
 
-        {/* Operational metrics */}
+        {/* Operational measures */}
         <Section
           number="E"
-          title="Operational metrics"
-          kicker="Eight measurements. Each named, defined, baselined."
+          title="Operational measures"
+          kicker="Eight ways we measure operational impact. Each named, defined, baselined."
         >
           <div className="grid grid-cols-4 gap-3">
             {METRIC_DEFS.map((m) => {
@@ -191,9 +189,9 @@ export default function ArchitecturePage() {
         </Section>
 
         {/* Closing line */}
-        <div className="pt-2 pb-6 border-t border-ink-700 text-[12.5px] text-ink-300 leading-relaxed">
+        <div className="pt-2 pb-6 border-t border-ink-700 text-[12.5px] text-ink-300 leading-relaxed max-w-[820px]">
           <span className="text-ink-100">Deployment philosophy.</span>{" "}
-          One workflow, deployed deep, measured rigorously. The architecture above is the contract between vendor, IT, Compliance, and Operations. When we expand to the next workflow, we re-run this exact decomposition first.
+          One workflow, deployed deeply, measured carefully. This page is the working alignment between Distyl, IT, Compliance, and Operations. When we expand to the next workflow, we run this same alignment first.
         </div>
       </div>
     </div>

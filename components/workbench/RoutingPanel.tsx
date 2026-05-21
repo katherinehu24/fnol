@@ -32,9 +32,9 @@ function tierFor(confidence: number, hasSiu: boolean): Tier {
 }
 
 const TIER_LABEL: Record<Tier, string> = {
-  auto: "Auto-route eligible",
-  review: "Human review",
-  escalate: "Escalation required",
+  auto: "Clear · auto-route",
+  review: "Partial · human review",
+  escalate: "Escalation · halt",
 };
 
 const TIER_TONE: Record<Tier, "good" | "warn" | "crit"> = {
@@ -44,9 +44,9 @@ const TIER_TONE: Record<Tier, "good" | "warn" | "crit"> = {
 };
 
 const TIER_RULE: Record<Tier, string> = {
-  auto: "≥ 0.85 confidence · no SIU indicators",
-  review: "0.50 – 0.85 · or coverage ambiguity flagged",
-  escalate: "< 0.50 · or any SIU indicator triggered",
+  auto: "Clear intake · no escalation signals",
+  review: "Partial intake · or coverage ambiguity",
+  escalate: "Insufficient intake · or SIU criteria met",
 };
 
 export function RoutingPanel({ claim }: { claim: Claim }) {
@@ -60,10 +60,10 @@ export function RoutingPanel({ claim }: { claim: Claim }) {
 
   return (
     <div className="overflow-y-auto p-3 space-y-3 bg-ink-850 border-l border-ink-700">
-      {/* Tier badge — the explicit auto/review/escalate framing */}
+      {/* Intake readiness — qualitative tier */}
       <div className="panel px-3 py-2.5">
         <div className="flex items-center justify-between mb-2">
-          <span className="data-label">Confidence tier</span>
+          <span className="data-label">Intake readiness</span>
           <Pill tone={TIER_TONE[tier]}>{TIER_LABEL[tier]}</Pill>
         </div>
         <ThresholdGuide tier={tier} confidence={claim.routing.confidence} hasSiu={!!claim.siuFlags?.length} />
@@ -72,7 +72,7 @@ export function RoutingPanel({ claim }: { claim: Claim }) {
       {/* Routing recommendation */}
       <Panel
         title="Routing recommendation"
-        subtitle="Routine: Routing v3.0"
+        subtitle="operational routing"
         actions={<Pill tone={DECISION_TONE[claim.routing.decision]}>{DECISION_LABEL[claim.routing.decision]}</Pill>}
       >
         <ConfidenceBar value={claim.routing.confidence} threshold={claim.routing.threshold} />
@@ -208,16 +208,19 @@ export function RoutingPanel({ claim }: { claim: Claim }) {
 
 function ThresholdGuide({ tier, confidence, hasSiu }: { tier: Tier; confidence: number; hasSiu: boolean }) {
   const pct = Math.round(confidence * 100);
+  const readiness =
+    tier === "auto" ? "Ready to assign" : tier === "review" ? "Needs review" : hasSiu ? "Halt · SIU" : "Halt · escalate";
   return (
     <div className="space-y-1">
-      <TierLine label="Auto-route eligible" range="≥ 85%" tone="good" active={tier === "auto"} />
-      <TierLine label="Human review" range="50 – 85%" tone="warn" active={tier === "review"} />
-      <TierLine label="Escalation required" range="< 50% · or SIU" tone="crit" active={tier === "escalate"} />
-      <div className="pt-1 mt-1 border-t border-ink-700/60 flex items-baseline justify-between text-2xs text-ink-300">
+      <TierLine label="Clear intake" sub="auto-route" tone="good" active={tier === "auto"} />
+      <TierLine label="Partial intake" sub="human review" tone="warn" active={tier === "review"} />
+      <TierLine label="Escalation signals" sub="halt for review" tone="crit" active={tier === "escalate"} />
+      <div className="pt-2 mt-1 border-t border-ink-700/60 flex items-baseline justify-between text-2xs text-ink-300">
         <span>This claim</span>
-        <span className="font-mono text-ink-100">
-          {pct}%
-          {hasSiu && <span className="text-crit"> · SIU triggered</span>}
+        <span className="text-ink-100">
+          {readiness}
+          {hasSiu && <span className="text-crit"> · {pct}% ready</span>}
+          {!hasSiu && <span className="text-ink-300 font-mono"> · {pct}% ready</span>}
         </span>
       </div>
     </div>
@@ -226,12 +229,12 @@ function ThresholdGuide({ tier, confidence, hasSiu }: { tier: Tier; confidence: 
 
 function TierLine({
   label,
-  range,
+  sub,
   tone,
   active,
 }: {
   label: string;
-  range: string;
+  sub: string;
   tone: "good" | "warn" | "crit";
   active: boolean;
 }) {
@@ -245,7 +248,7 @@ function TierLine({
         <IconDot tone={tone} />
         {label}
       </span>
-      <span className={`font-mono ${active ? "text-ink-100" : "text-ink-500"}`}>{range}</span>
+      <span className={active ? "text-ink-200" : "text-ink-500"}>{sub}</span>
     </div>
   );
 }

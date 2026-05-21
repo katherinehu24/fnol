@@ -64,7 +64,7 @@ export function CoverageBlock({ claim }: { claim: Claim }) {
       )}
 
       <div className="mt-2 flex items-baseline justify-between text-2xs text-ink-300">
-        <span>Reserve estimate (Routine recommendation):</span>
+        <span>Reserve estimate (recommended):</span>
         <span className="font-mono text-ink-100">{formatMoney(coverageSummary.reserveEstimate)}</span>
       </div>
     </Panel>

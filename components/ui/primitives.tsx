@@ -92,9 +92,9 @@ export function ConfidenceBar({ value, threshold }: { value: number; threshold: 
   return (
     <div className="w-full">
       <div className="flex items-baseline justify-between mb-1">
-        <span className="data-label">Routing confidence</span>
-        <span className={`font-mono text-[12px] ${passing ? "text-ok" : "text-amber"}`}>
-          {pct}% {passing ? "≥" : "<"} {tpct}%
+        <span className="data-label">Intake readiness</span>
+        <span className={`text-[12px] ${passing ? "text-ok" : "text-amber"}`}>
+          {passing ? "above auto-route threshold" : "below auto-route threshold"}
         </span>
       </div>
       <div className="relative h-1.5 bg-ink-700 rounded-sm overflow-hidden">
@@ -102,12 +102,12 @@ export function ConfidenceBar({ value, threshold }: { value: number; threshold: 
           className={`absolute inset-y-0 left-0 ${passing ? "bg-ok" : "bg-amber"}`}
           style={{ width: `${pct}%` }}
         />
-        <div className="absolute inset-y-0 w-px bg-ink-50/70" style={{ left: `${tpct}%` }} title={`Threshold ${tpct}%`} />
+        <div className="absolute inset-y-0 w-px bg-ink-50/70" style={{ left: `${tpct}%` }} title="Auto-route threshold" />
       </div>
       <div className="flex justify-between mt-1 text-2xs text-ink-400">
-        <span>0%</span>
-        <span>Threshold {tpct}%</span>
-        <span>100%</span>
+        <span>Insufficient</span>
+        <span>Auto-route threshold</span>
+        <span>Clear</span>
       </div>
     </div>
   );

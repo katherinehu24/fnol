@@ -38,11 +38,11 @@ export function DecisionLattice() {
   return (
     <section>
       {/* Path trace toolbar */}
-      <div className="flex items-end justify-between gap-4 mb-5">
+      <div className="flex items-end justify-between gap-4 mb-6">
         <div>
           <div className="text-2xs uppercase tracking-[0.18em] text-accent">Trace a claim</div>
-          <div className="text-[12.5px] text-ink-300 mt-0.5">
-            Highlight one path through the lattice. Three representative cases.
+          <div className="text-[12.5px] text-ink-300 mt-1">
+            Light up the routing path for one representative claim.
           </div>
         </div>
         <div className="flex items-center gap-1.5">
@@ -84,12 +84,12 @@ export function DecisionLattice() {
 
       {/* The lattice */}
       <div
-        className="grid gap-x-6 gap-y-0 relative"
+        className="grid gap-x-8 gap-y-0 relative"
         style={{ gridTemplateColumns: `repeat(${STAGES.length}, minmax(0, 1fr))` }}
       >
         {STAGES.map((stage, i) => (
-          <div key={stage} className="pb-3 border-b border-ink-700">
-            <div className="flex items-baseline gap-2 mb-0.5">
+          <div key={stage} className="pb-4 border-b border-ink-700">
+            <div className="flex items-baseline gap-2 mb-1">
               <span className="font-mono text-2xs text-ink-400">{STAGE_NUMBER[stage]}</span>
               <span className="text-2xs uppercase tracking-[0.16em] text-ink-100 font-medium">
                 {STAGE_LABEL[stage]}
@@ -100,7 +100,7 @@ export function DecisionLattice() {
         ))}
 
         {STAGES.map((stage) => (
-          <div key={stage} className="pt-4 pr-3 space-y-3">
+          <div key={stage} className="pt-5 pr-3 space-y-4">
             {NODES.filter((n) => n.stage === stage).map((n) => {
               const dim = activePathId !== null && !onPath.has(n.id);
               const lit = activePathId !== null && onPath.has(n.id);
@@ -142,8 +142,8 @@ export function DecisionLattice() {
       </div>
 
       {/* Legend + path detail strip */}
-      <div className="mt-6 pt-4 border-t border-ink-700 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-5 text-2xs text-ink-300">
+      <div className="mt-8 pt-4 border-t border-ink-700 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-6 text-2xs text-ink-300">
           <span className="flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-ok" /> Automated
           </span>
@@ -151,7 +151,7 @@ export function DecisionLattice() {
             <span className="h-1.5 w-1.5 rounded-full bg-amber" /> Human review
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-crit" /> Escalated · halt
+            <span className="h-1.5 w-1.5 rounded-full bg-crit" /> Halt · escalation
           </span>
         </div>
         {activePath && (
